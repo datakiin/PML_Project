@@ -1,0 +1,104 @@
+---
+title: "Using Sensor Data to Predict Proper Exercise Technique"
+author: "Kamran Haroon"
+date: "December 27, 2015"
+output: html_document
+---
+
+
+### Summary
+
+The purpose of this project is to predict if subjects have performed a physical exercise correctly using data from multiple motion sensors. The training and test datasets are processed by removing columns that are not used to train our models. We consider multiple approaches and select a random forest algorithm that yields an accuracy of xx% on the test set. As a final validation, the selected model is used on 20 tests on a newer unseen dataset. 
+
+The training data for this project are available here: 
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here: 
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. and they have been very generous in allowing their data to be used for this kind of assignment.
+
+
+### Data Processing
+
+The data for this project came from a research project focused on Human Activity Recognition (HAR).  The participants in the study were asked to perform bicep curls correctly and incorrectly in 5 different ways.  Each way is considered a class, A-F, and recorded in the classe variable of the data set.
+
+* Class A: exactly according to the specification
+* Class B: throwing the elbows to the front
+* Class C: lifting the dumbbell only halfway
+* Class D: lowering the dumbbell only halfway 
+* Class E: throwing the hips to the front 
+
+The sensor data was recorded by accelerometers on the participant's belt, forearm, arm, and dumbell.  For more detail see  http://groupware.les.inf.puc-rio.br/har.  
+```{r loadtraindata, echo = TRUE}
+
+set.seed(12345)
+
+# Verify the training/test data has been downloaded into a data folder in the working directory
+if (!file.exists("./data/pml-training.csv")) {
+        dataUrl = "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+        download.file(dataUrl, destfile = "./data/pml-training.csv", method = "curl")
+        }
+
+if (!file.exists("./data/pml-testing.csv")) {
+        dataUrl = "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+        download.file(dataUrl, destfile = "./data/pml-testing.csv", method = "curl")
+        }
+
+# Load in the data
+pmlTrain <- read.csv("./data/pml-training.csv", header = TRUE)
+pmlTest <- read.csv("./data/pml-testing.csv", header = TRUE)
+dim(pmlTrain)
+dim(pmlTest)
+```
+
+```{r libload, echo = FALSE, message = FALSE}
+library(dplyr)
+library(caret, quietly = TRUE)
+
+# Get a list of the test columns with NA in the column
+naNames <- names(pmlTest[, colSums(is.na(pmlTest)) == nrow(pmlTest)])
+  
+# Remove columns from the training set that are NA in the test set 
+pmltrain <- pmlTrain[,-which(names(pmlTrain) %in% naNames)]
+```
+
+```{r reducepredicters, echo = TRUE}
+# only keep the sensor based columns and the classe 
+pmlTrain <- select(pmlTrain, roll_belt:classe)
+names(pmlTrain)
+```
+
+### Model Creation
+
+### Application on Test Cases
+
+
+```{r exploredata, echo = TRUE}
+library(ggplot2)
+qplot(roll_belt,pitch_belt,colour=classe,data=pmlTrain)
+```
+
+```{r splitdata, echo = TRUE}
+inTrain <- createDataPartition(y=pmlTrain$classe, p=0.60, list=FALSE)
+training <- pmlTrain[inTrain,] 
+dim(training)
+testing <- pmlTrain[-inTrain,] 
+dim(testing)
+```
+
+```{r trainmodel, echo = TRUE, cache=TRUE}
+#   library(doMC)
+#   registerDoMC(cores = 6)
+#   modFit <- train(classe ~ ., data=training, method="rf")
+
+model_crf <- train(classe ~ ., data = training, method = 'rf', 
+                   trControl = trainControl(method = "cv",number = 4,))
+model_crf
+model_crf$finalModel
+
+
+
+```
