@@ -8,7 +8,7 @@ output: html_document
 
 ## Summary
 
-The purpose of this project is to predict if subjects have performed a physical exercise correctly using data from multiple motion sensors. The training and test datasets are processed by removing columns that are not used to train our models. We consider multiple approaches and select a random forest algorithm that yields an accuracy of 99% on the test set. As a final validation, the selected model is used on 20 tests on a newer unseen dataset. 
+This project attempts to predict whether subjects have performed a physical exercise correctly using data from multiple motion sensors. The training and test datasets are processed by removing columns that are not used to train our models. We consider multiple approaches and select a random forest algorithm that yields an accuracy of 99% on the test set. As a final validation, the selected model is used on 20 tests based on previously unseen data.
 
 The training data for this project are available here: 
 
@@ -30,7 +30,7 @@ The data for this project came from a research project focused on Human Activity
 * Class E: throwing the hips to the front 
 
 The sensor data was recorded by accelerometers on the participant's belt, forearm, arm, and dumbell.  For more detail see  http://groupware.les.inf.puc-rio.br/har.  
-```{r loadtraindata, echo = TRUE}
+```{r inputdata, echo = TRUE}
 
 set.seed(12345)
 
@@ -59,7 +59,7 @@ dim(pmlTest)
 
 ### Feature Selection
 We remove columns from the training data that are not used to train the model.  Apparently, NA values cannot be used as predictors because errors result from thier inclusion in the model. Thus the test columns with all NAs are pruned from the training data.
-```{r featureselection, echo = FALSE, message = FALSE}
+```{r features, echo = FALSE, message = FALSE}
 library(dplyr)
 library(caret)
 
@@ -72,7 +72,7 @@ pmlTrain <- pmlTrain[,-which(names(pmlTrain) %in% naNames)]
 
 Next we remove columns like user_name, time stamps, and window columns as predictors so that our model is based solely on the sensor data.  
 
-```{r reducepredicters, echo = TRUE}
+```{r reducepredictors, echo = TRUE}
 # Keep only the sensor data columns and classe 
 pmlTrain <- select(pmlTrain, roll_belt:classe)
 names(pmlTrain)
@@ -103,8 +103,9 @@ dim(testing)
 
 ```{r trainmodel, echo = TRUE, cache=TRUE}
 library(randomForest)
-model <- train(classe ~ ., data = training, method = 'rf')
-                  
+model <- train(classe ~ ., data = training, method = 'rf', trControl =
+                       trainControl(method = "cv",number = 4))
+                
 model
 model$finalModel
 ```
