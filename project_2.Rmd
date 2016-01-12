@@ -1,14 +1,14 @@
 ---
 title: "Using Sensor Data to Predict Proper Exercise Technique"
 author: "Kamran Haroon"
-date: "December 27, 2015"
+date: "January xx, 2015"
 output: html_document
 ---
 
 
 ## Summary
 
-This project attempts to predict whether subjects have performed an exercise correctly using Human Activity Recogniton (HAR). The training and test datasets are processed by removing columns that are not useful to train our models. We consider multiple approaches and select a random forest algorithm that yields an accuracy of 99% on the test set. As a final validation, the selected model is used on 20 tests based on previously unseen data.
+This project attempts to predict whether subjects have performed a physical exercise correctly using Human Activity Recogniton (HAR). The training and test datasets are processed by removing columns that are not useful to train our models. We consider multiple approaches and select a random forest algorithm that yields an accuracy of 99% on the test set. As a final validation, the selected model is used on 20 tests based on previously unseen data.
 
 The training data for this project are available here: 
 
@@ -29,10 +29,15 @@ The data for this project came from a research project focused on Human Activity
 * Class D: lowering the dumbbell only halfway 
 * Class E: throwing the hips to the front 
 
-The sensor data was recorded by accelerometers on the participant's belt, forearm, arm, and dumbell.  For more detail see  http://groupware.les.inf.puc-rio.br/har.  
+The sensor data was recorded by accelerometers on the participant's belt, forearm, arm, and dumbell.  For more detail see  http://groupware.les.inf.puc-rio.br/har.
 ```{r inputdata, echo = TRUE}
 
 set.seed(12345)
+
+if (!dir.exists("./data")) {
+        dir.create(".data")
+        }
+
 
 # Verify the training/test data has been downloaded into a data folder in the working directory
 if (!file.exists("./data/pml-training.csv")) {
@@ -117,8 +122,8 @@ We now use the test data segregated for cross validation to gauge our model's ac
 
 ```{r verifymodel, echo=TRUE}
 predictions <- predict(model, testing)
-y <- confusionMatrix(predictions,testing$classe)
-y
+confusionMatrix(data = predictions, testing$classe)
+#confusionMatrix(predictions,testing$classe)
 ```
 
 ### Out of sample Error
@@ -129,20 +134,20 @@ As out of sample error can be defined as (1 - accuracy), the out of sample error
 ## Application on Test Cases
 
 ```{r, finalpredictions, echo=TRUE}
-# predictFinal <- predict(model, pmlTest)
-# predictFinal
-# 
-# results <- "./results"
-# if(!file.exists(results)) {dir.create(results)}
-# 
-# pml_write_files = function(x){
-#   n = length(x)
-#   for(i in 1:n){
-#     filename = paste0("problem_id_",i,".txt")
-#     write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
-#   }
-# }
-# 
-# 
-# pml_write_files(predictFinal,results)
+predictFinal <- predict(model, pmlTest)
+predictFinal
+
+results <- "./results"
+if(!file.exists("./data/results")) {file.create(results)}
+
+pml_write_files = function(x) {
+  n = length(x)
+  for(i in 1:n) {
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+
+pml_write_files(predictFinal,results)
 ```
