@@ -6,4 +6,26 @@ output: html_document
 ---
 
 ## Summary
-This project attempts to predict whether test subjects have performed a physical activity correctly by using data from multiple motion sensors.
+This project attempts to predict whether test subjects have performed a physical activity correctly by using data from multiple motion sensors. The training and test datasets are simplified for only the columns related to motion sensor data. 
+
+## Data Processing
+
+### Feature selection
+
+### Exploratory analysis
+
+### Cross-validation
+
+
+## Creating Models
+
+### Creating models
+
+### Accuracy
+
+### Out-of-sample error
+
+
+
+
+## Application on Test Cases
