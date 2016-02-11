@@ -1,0 +1,108 @@
+---
+title: "Using Sensor Data To Model Physical Exercise"
+author: "Kamran Haroon"
+date: "February 11, 2016"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r loadtraindata, echo = TRUE}
+  #setwd("~/Documents/coursera/datascience/predmachlearn/project/practicalmachinelearning")
+  set.seed(327)
+
+  # Verify the pml-training.csv has been downloaded 
+  if (!file.exists("./data/pml-training.csv")) {
+    dataUrl <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+    download.file(dataUrl, destfile = "./data/pml-training.csv", method = "curl")
+  }
+
+  # load the data in the pmltrain dataframe
+  pmlTrain <- read.csv("./data/pml-training.csv", header = TRUE)
+  dim(pmlTrain)
+```
+
+```{r libload, echo = FALSE, message = FALSE}
+  library(dplyr)
+  library(caret)
+```
+
+```{r tidytrainingdata, echo = TRUE}
+  # Verify the pml-testing.csv has been downloaded 
+  if (!file.exists("./data/pml-testing.csv")) {
+    dataUrl <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+    download.file(dataUrl, destfile = "./data/pml-testing.csv", method = "curl")
+  }
+
+  # load the data in the test dataframe
+  pmlTest <- read.csv("./data/pml-testing.csv", header = TRUE)
+  dim(pmlTest)
+  
+  # get a list of the test columns with NA in the column
+  naNames <- names(pmlTest[, colSums(is.na(pmlTest)) == nrow(pmlTest)])
+  
+  # remove columns from the training set that are NA in the test set 
+  pmlTrain <- pmlTrain[,-which(names(pmlTrain) %in% naNames)]
+```
+
+```{r reducepredicters, echo = TRUE}
+  # only keep the sensor based columns and the classe 
+  pmlTrain <- select(pmlTrain, roll_belt:classe)
+  names(pmlTrain)
+```
+
+```{r exploredata, echo = TRUE}
+  library(ggplot2)
+  qplot(roll_belt, pitch_belt, colour=classe, data=pmlTrain)
+```
+
+```{r splitdata, echo = TRUE}
+  inTrain <- createDataPartition(y=pmlTrain$classe, p=0.60, list=FALSE)
+  training <- pmlTrain[inTrain,] 
+  preTest <- pmlTrain[-inTrain,] 
+```
+
+``` {r trainmodel2, echo = TRUE, cache = TRUE, message = FALSE}
+  # step 1: configure parallel processing
+  library(parallel)
+  library(doParallel)
+  cluster <- makeCluster(detectCores() -1)
+  registerDoParallel(cluster)
+  
+  # step 2: configure trainControl object
+  fitControl <- trainControl(method = "cv",
+                             number = 10,
+                             allowParallel = T)
+  
+  # step 3: develop training model
+  modFit <- train(classe~., method = "rf",
+               data=training, trControl = fitControl)
+  
+  # step 4: close the cluster
+  stopCluster(cluster)
+```
+
+```{r verifymodel, echo=TRUE}
+  predictions <- predict(modFit, preTest)
+  confusionMatrix(predictions,preTest$classe)
+```
+
+```{r, finalpredictions, echo=TRUE}
+  predictfinal <- predict(modFit, pmlTest)
+  predictfinal
+
+  results <- "./results"
+  if(!file.exists(results)) {dir.create(results)}
+
+  pml_write_files = function(x,y){
+    n = length(x)
+    for(i in 1:n){
+      filename = paste(y,"/problem_id_",i,".txt",sep="")
+      write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+    }
+  }
+
+  pml_write_files(predictfinal,results)  
+```
