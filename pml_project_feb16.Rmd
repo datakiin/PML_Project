@@ -8,6 +8,12 @@ output: html_document
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+### Summary
+
+### Data Processing
+
+#### Loading the data
+
 
 ```{r loadtraindata, echo = TRUE}
   #setwd("~/Documents/coursera/datascience/predmachlearn/project/practicalmachinelearning")
@@ -24,6 +30,8 @@ When you click the **Knit** button a document will be generated that includes bo
   dim(pmlTrain)
 ```
 
+
+#### Feature Selection
 ```{r libload, echo = FALSE, message = FALSE}
   library(dplyr)
   library(caret)
@@ -53,17 +61,22 @@ When you click the **Knit** button a document will be generated that includes bo
   names(pmlTrain)
 ```
 
+
+#### Data Exploration
 ```{r exploredata, echo = TRUE}
   library(ggplot2)
   qplot(roll_belt, pitch_belt, colour=classe, data=pmlTrain)
 ```
 
+
+#### Cross-validation
 ```{r splitdata, echo = TRUE}
   inTrain <- createDataPartition(y=pmlTrain$classe, p=0.60, list=FALSE)
   training <- pmlTrain[inTrain,] 
   preTest <- pmlTrain[-inTrain,] 
 ```
 
+### Model Creaton and verificaton
 ``` {r trainmodel2, echo = TRUE, cache = TRUE, message = FALSE}
   # step 1: configure parallel processing
   library(parallel)
@@ -84,12 +97,15 @@ When you click the **Knit** button a document will be generated that includes bo
   stopCluster(cluster)
 ```
 
-```{r verifymodel, echo=TRUE}
+
+#### Accuracy and Out-of-sample Error
+```{r verifymodel, echo=TRUE, message=FALSE}
   predictions <- predict(modFit, preTest)
   confusionMatrix(predictions,preTest$classe)
 ```
 
-```{r, finalpredictions, echo=TRUE}
+### Project Prediction Quiz
+```{r, finalpredictions, echo=TRUE, message=FALSE}
   predictfinal <- predict(modFit, pmlTest)
   predictfinal
 
