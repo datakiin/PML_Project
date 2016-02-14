@@ -104,9 +104,9 @@ For cross validation purposes we segregate our processed training set into train
 
 From the different machine learining algorithms avaialable, we selected the random forest procedure. We feel this was appropriate as all variables are tested through the classification trees to determine a meaningful predicitive ability of the outcome - the classe variable.
 
-Building random forest classifications for a large number of variables is a computationally intensive task and can take some time. We use the doParallel package in R to enable parallel computations and speed up the process considerably on most personal computers processing one computation at a time.
+Building random forest classifications for a large number of variables is a computationally intensive task and can take some time. We use the doParallel package in R to enable parallel computations and speed up the process considerably on most personal computers processing limited computations at one time.
 
-``` {r trainmodel2, echo = TRUE, cache = TRUE, message = FALSE}
+``` {r trainModel, echo = TRUE, cache = TRUE, message = FALSE}
   # step 1: configure parallel processing
   library(parallel)
   library(doParallel)
