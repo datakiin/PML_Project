@@ -68,14 +68,15 @@ img {
 </div>
 
 
-<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this: ### Summary</p>
+<div id="summary" class="section level3">
+<h3>Summary</h3>
+<p>This process uses motion sensor data and machine learning tools to predict whether pariticipants perform a physical exercise correctly, or not. the training and test data was provided by . Columns not related to sensor measurements were removed from the training data set. For cross-validation, the training data was further split into training and preTest data sets. The model was built using random forest and yielded an accuracy of xx%. For final verification, our model passed 20 prediction tests on previously unseen data.</p>
+</div>
 <div id="data-processing" class="section level3">
 <h3>Data Processing</h3>
 <div id="loading-the-data" class="section level4">
 <h4>Loading the data</h4>
-<pre class="r"><code>  #setwd(&quot;~/Documents/coursera/datascience/predmachlearn/project/practicalmachinelearning&quot;)
-  set.seed(327)
+<pre class="r"><code>  set.seed(327)
 
   # Verify the pml-training.csv has been downloaded 
   if (!file.exists(&quot;./data/pml-training.csv&quot;)) {
@@ -149,13 +150,10 @@ img {
   registerDoParallel(cluster)
   
   # step 2: configure trainControl object
-  fitControl &lt;- trainControl(method = &quot;cv&quot;,
-                             number = 10,
-                             allowParallel = T)
+  fitControl &lt;- trainControl(method = &quot;cv&quot;, number = 10, allowParallel = T)
   
   # step 3: develop training model
-  modFit &lt;- train(classe~., method = &quot;rf&quot;,
-               data=training, trControl = fitControl)
+  modFit &lt;- train(classe~., method = &quot;rf&quot;, data=training, trControl = fitControl)
   
   # step 4: close the cluster
   stopCluster(cluster)</code></pre>
@@ -167,11 +165,11 @@ img {
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 2232    9    0    0    0
+##          A 2231    9    0    0    0
 ##          B    0 1500   14    0    0
-##          C    0    9 1350   19    0
-##          D    0    0    4 1266    1
-##          E    0    0    0    1 1441
+##          C    0    9 1350   18    0
+##          D    0    0    4 1267    1
+##          E    1    0    0    1 1441
 ## 
 ## Overall Statistics
 ##                                           
@@ -186,14 +184,14 @@ img {
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            1.0000   0.9881   0.9868   0.9844   0.9993
-## Specificity            0.9984   0.9978   0.9957   0.9992   0.9998
-## Pos Pred Value         0.9960   0.9908   0.9797   0.9961   0.9993
-## Neg Pred Value         1.0000   0.9972   0.9972   0.9970   0.9998
+## Sensitivity            0.9996   0.9881   0.9868   0.9852   0.9993
+## Specificity            0.9984   0.9978   0.9958   0.9992   0.9997
+## Pos Pred Value         0.9960   0.9908   0.9804   0.9961   0.9986
+## Neg Pred Value         0.9998   0.9972   0.9972   0.9971   0.9998
 ## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
-## Detection Rate         0.2845   0.1912   0.1721   0.1614   0.1837
-## Detection Prevalence   0.2856   0.1930   0.1756   0.1620   0.1838
-## Balanced Accuracy      0.9992   0.9930   0.9913   0.9918   0.9996</code></pre>
+## Detection Rate         0.2843   0.1912   0.1721   0.1615   0.1837
+## Detection Prevalence   0.2855   0.1930   0.1755   0.1621   0.1839
+## Balanced Accuracy      0.9990   0.9930   0.9913   0.9922   0.9995</code></pre>
 </div>
 </div>
 <div id="project-prediction-quiz" class="section level3">

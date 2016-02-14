@@ -5,18 +5,19 @@ date: "February 11, 2016"
 output: html_document
 ---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 ### Summary
+This process uses motion sensor data and machine learning tools to predict whether pariticipants perform a physical exercise correctly, or not. the training and test data was provided by . Columns not related to sensor measurements were removed from the training data set. For cross-validation, the training data was further split into training and preTest data sets. The model was built using random forest and yielded an accuracy of xx%. For final verification, our model passed 20 prediction tests on previously unseen data.
+
 
 ### Data Processing
+
+
 
 #### Loading the data
 
 
 ```{r loadtraindata, echo = TRUE}
-  #setwd("~/Documents/coursera/datascience/predmachlearn/project/practicalmachinelearning")
   set.seed(327)
 
   # Verify the pml-training.csv has been downloaded 
@@ -85,13 +86,10 @@ When you click the **Knit** button a document will be generated that includes bo
   registerDoParallel(cluster)
   
   # step 2: configure trainControl object
-  fitControl <- trainControl(method = "cv",
-                             number = 10,
-                             allowParallel = T)
+  fitControl <- trainControl(method = "cv", number = 10, allowParallel = T)
   
   # step 3: develop training model
-  modFit <- train(classe~., method = "rf",
-               data=training, trControl = fitControl)
+  modFit <- train(classe~., method = "rf", data=training, trControl = fitControl)
   
   # step 4: close the cluster
   stopCluster(cluster)
