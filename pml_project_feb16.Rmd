@@ -7,56 +7,71 @@ output: html_document
 
 
 ### Summary
-This process uses motion sensor data and machine learning tools to predict whether pariticipants perform a physical exercise correctly, or not. the training and test data was provided by . Columns not related to sensor measurements were removed from the training data set. For cross-validation, the training data was further split into training and preTest data sets. The model was built using random forest and yielded an accuracy of xx%. For final verification, our model passed 20 prediction tests on previously unseen data.
+This process uses motion sensor data and machine learning tools to predict whether pariticipants perform a physical exercise correctly, or not. the training and test data was provided by . Columns not related to sensor measurements were removed from the training data set. For cross-validation, the training data was further split into training and preTest data sets. The model was built using random forest and yielded an accuracy of 99%. For final verification, our model passed 20 prediction tests on previously unseen data.
 
 
 ### Data Processing
 
+The data for this project is provided by the [HAR]{http://www.google.com.pk}. The participants in the study were asked to perform bicep curls correctly and incorrectly in 5 different ways.  Each way is considered a class, A-F, and recorded in the classe variable of the data set.
 
+* Class A: exactly according to the specification
+* Class B: throwing the elbows to the front
+* Class C: lifting the dumbbell only halfway
+* Class D: lowering the dumbbell only halfway 
+* Class E: throwing the hips to the front 
+
+The sensor data was recorded by accelerometers on the participant's belt, forearm, arm, and dumbell.
 
 #### Loading the data
 
+The training and test datasets are downloaded from source into the data folder in the user's working directory.
 
-```{r loadtraindata, echo = TRUE}
-  set.seed(327)
+```{r getData, echo = TRUE}
+  # set random number for reproductivity
+  set.seed(5150)
 
-  # Verify the pml-training.csv has been downloaded 
+  # Check if data folder exists in user's working directory
+  data <- "./data"
+  if(!file.exists(data)) {dir.create(data)}
+
+  # Download the training data from URL  
   if (!file.exists("./data/pml-training.csv")) {
     dataUrl <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
     download.file(dataUrl, destfile = "./data/pml-training.csv", method = "curl")
   }
-
-  # load the data in the pmltrain dataframe
-  pmlTrain <- read.csv("./data/pml-training.csv", header = TRUE)
-  dim(pmlTrain)
-```
-
-
-#### Feature Selection
-```{r libload, echo = FALSE, message = FALSE}
-  library(dplyr)
-  library(caret)
-```
-
-```{r tidytrainingdata, echo = TRUE}
-  # Verify the pml-testing.csv has been downloaded 
+  
+  # Download the test data from URL
   if (!file.exists("./data/pml-testing.csv")) {
     dataUrl <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
     download.file(dataUrl, destfile = "./data/pml-testing.csv", method = "curl")
   }
 
-  # load the data in the test dataframe
+  # load the downloaded files as dataframe objects
+  pmlTrain <- read.csv("./data/pml-training.csv", header = TRUE)
   pmlTest <- read.csv("./data/pml-testing.csv", header = TRUE)
-  dim(pmlTest)
-  
-  # get a list of the test columns with NA in the column
+ 
+```
+
+
+#### Feature Selection
+
+In selecting features for our model, we remove columns which have NA values for the test data set. Since these are not used in predicting the classe, we remove them from the list of variables used to train our model. 
+
+```{r loadLib, echo = FALSE, message = FALSE}
+  library(dplyr)
+  library(caret)
+```
+
+```{r removeFeatures, echo = TRUE}
+  # get a list of the test set columns containing NAs
   naNames <- names(pmlTest[, colSums(is.na(pmlTest)) == nrow(pmlTest)])
   
-  # remove columns from the training set that are NA in the test set 
+  # remove those columns from the training set 
   pmlTrain <- pmlTrain[,-which(names(pmlTrain) %in% naNames)]
 ```
 
-```{r reducepredicters, echo = TRUE}
+We further reduce the features set by removing columns such as user name, time stamps etc. not directly related to motion sensor data.
+```{r reduceFields, echo = TRUE}
   # only keep the sensor based columns and the classe 
   pmlTrain <- select(pmlTrain, roll_belt:classe)
   names(pmlTrain)
@@ -64,20 +79,33 @@ This process uses motion sensor data and machine learning tools to predict wheth
 
 
 #### Data Exploration
-```{r exploredata, echo = TRUE}
+Exploring the sensor data with visualization can be useful in classifying the exercise routines. We plot the roll_belt vs pitch_belt variables and use classe for coloring the data. 
+
+```{r exploreData, echo = TRUE}
   library(ggplot2)
   qplot(roll_belt, pitch_belt, colour=classe, data=pmlTrain)
 ```
 
+Examining our plot, class E - throwing hips to the front stands out from the other classes. This seems plausible as this motion could be related to correctly lifting the dumbell and transferring the weight through the spine to the hips.
 
-#### Cross-validation
+
+#### Cross Validation
+
+For cross validation purposes we segregate our processed training set into training and preTest sets using a 60/40 split. This preTest set will later be used to estimate out of sample error and accuracy of the completed model.
+
 ```{r splitdata, echo = TRUE}
+  # Further split of training set into trianing and preTest observations
   inTrain <- createDataPartition(y=pmlTrain$classe, p=0.60, list=FALSE)
   training <- pmlTrain[inTrain,] 
   preTest <- pmlTrain[-inTrain,] 
 ```
 
-### Model Creaton and verificaton
+### Model Creaton and Verificaton
+
+From the different machine learining algorithms avaialable, we selected the random forest procedure. We feel this was appropriate as all variables are tested through the classification trees to determine a meaningful predicitive ability of the outcome - the classe variable.
+
+Building random forest classifications for a large number of variables is a computationally intensive task and can take some time. We use the doParallel package in R to enable parallel computations and speed up the process considerably on most personal computers processing one computation at a time.
+
 ``` {r trainmodel2, echo = TRUE, cache = TRUE, message = FALSE}
   # step 1: configure parallel processing
   library(parallel)
@@ -97,13 +125,19 @@ This process uses motion sensor data and machine learning tools to predict wheth
 
 
 #### Accuracy and Out-of-sample Error
-```{r verifymodel, echo=TRUE, message=FALSE}
+The preTest data split for cross validation is used to initially test the model's accuracy. The confusion matrix shows predictions against reference classes A-E.
+
+The out of sample error is the error rate observed on the preTest data which is 100% - accuracy = 100% - 99.68% = .32%.
+
+```{r modelCheck, echo=TRUE, message=FALSE}
   predictions <- predict(modFit, preTest)
   confusionMatrix(predictions,preTest$classe)
 ```
 
 ### Project Prediction Quiz
-```{r, finalpredictions, echo=TRUE, message=FALSE}
+Our random forest model is applied to the 20 test cases provided in the final test set. The results are saved to files for project submission. 
+
+```{r, finalPredictions, echo=TRUE, message=FALSE}
   predictfinal <- predict(modFit, pmlTest)
   predictfinal
 
