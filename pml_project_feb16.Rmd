@@ -12,7 +12,7 @@ This process uses motion sensor data and machine learning tools to predict wheth
 
 ### Data Processing
 
-The data for this project is provided by the [HAR]{http://www.google.com.pk}. The participants in the study were asked to perform bicep curls correctly and incorrectly in 5 different ways.  Each way is considered a class, A-F, and recorded in the classe variable of the data set.
+The data for this project is provided by the the Human Activity Recognition project at Groupware. The participants in the study were asked to perform bicep curls correctly and incorrectly in 5 different ways.  Each way is considered a class, A-F, and recorded in the classe variable of the data set.
 
 * Class A: exactly according to the specification
 * Class B: throwing the elbows to the front
@@ -20,7 +20,7 @@ The data for this project is provided by the [HAR]{http://www.google.com.pk}. Th
 * Class D: lowering the dumbbell only halfway 
 * Class E: throwing the hips to the front 
 
-The sensor data was recorded by accelerometers on the participant's belt, forearm, arm, and dumbell.
+The sensor data was recorded by accelerometers on the participant's belt, forearm, arm, and dumbell. For more detail see http://groupware.les.inf.puc-rio.br/har.
 
 #### Loading the data
 

@@ -74,7 +74,7 @@ img {
 </div>
 <div id="data-processing" class="section level3">
 <h3>Data Processing</h3>
-<p>The data for this project is provided by the [HAR]{<a href="http://www.google.com.pk" class="uri">http://www.google.com.pk</a>}. The participants in the study were asked to perform bicep curls correctly and incorrectly in 5 different ways. Each way is considered a class, A-F, and recorded in the classe variable of the data set.</p>
+<p>The data for this project is provided by the the Human Activity Recognition project at Groupware. The participants in the study were asked to perform bicep curls correctly and incorrectly in 5 different ways. Each way is considered a class, A-F, and recorded in the classe variable of the data set.</p>
 <ul>
 <li>Class A: exactly according to the specification</li>
 <li>Class B: throwing the elbows to the front</li>
@@ -82,7 +82,7 @@ img {
 <li>Class D: lowering the dumbbell only halfway</li>
 <li>Class E: throwing the hips to the front</li>
 </ul>
-<p>The sensor data was recorded by accelerometers on the participant’s belt, forearm, arm, and dumbell.</p>
+<p>The sensor data was recorded by accelerometers on the participant’s belt, forearm, arm, and dumbell. For more detail see <a href="http://groupware.les.inf.puc-rio.br/har" class="uri">http://groupware.les.inf.puc-rio.br/har</a>.</p>
 <div id="loading-the-data" class="section level4">
 <h4>Loading the data</h4>
 <p>The training and test datasets are downloaded from source into the data folder in the user’s working directory.</p>
@@ -160,7 +160,7 @@ img {
 <div id="model-creaton-and-verificaton" class="section level3">
 <h3>Model Creaton and Verificaton</h3>
 <p>From the different machine learining algorithms avaialable, we selected the random forest procedure. We feel this was appropriate as all variables are tested through the classification trees to determine a meaningful predicitive ability of the outcome - the classe variable.</p>
-<p>Building random forest classifications for a large number of variables is a computationally intensive task and can take some time. We use the doParallel package in R to enable parallel computations and speed up the process considerably on most personal computers processing one computation at a time.</p>
+<p>Building random forest classifications for a large number of variables is a computationally intensive task and can take some time. We use the doParallel package in R to enable parallel computations and speed up the process considerably on most personal computers processing limited computations at one time.</p>
 <pre class="r"><code>  # step 1: configure parallel processing
   library(parallel)
   library(doParallel)
@@ -185,33 +185,33 @@ img {
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 2232    4    0    0    0
-##          B    0 1510    6    0    0
-##          C    0    4 1361    9    0
-##          D    0    0    1 1276    0
-##          E    0    0    0    1 1442
+##          A 2232   16    0    0    0
+##          B    0 1497   19    0    0
+##          C    0    5 1348   31    1
+##          D    0    0    1 1253    1
+##          E    0    0    0    2 1440
 ## 
 ## Overall Statistics
 ##                                           
-##                Accuracy : 0.9968          
-##                  95% CI : (0.9953, 0.9979)
+##                Accuracy : 0.9903          
+##                  95% CI : (0.9879, 0.9924)
 ##     No Information Rate : 0.2845          
 ##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
 ##                                           
-##                   Kappa : 0.996           
+##                   Kappa : 0.9877          
 ##  Mcnemar's Test P-Value : NA              
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            1.0000   0.9947   0.9949   0.9922   1.0000
-## Specificity            0.9993   0.9991   0.9980   0.9998   0.9998
-## Pos Pred Value         0.9982   0.9960   0.9905   0.9992   0.9993
-## Neg Pred Value         1.0000   0.9987   0.9989   0.9985   1.0000
+## Sensitivity            1.0000   0.9862   0.9854   0.9743   0.9986
+## Specificity            0.9971   0.9970   0.9943   0.9997   0.9997
+## Pos Pred Value         0.9929   0.9875   0.9733   0.9984   0.9986
+## Neg Pred Value         1.0000   0.9967   0.9969   0.9950   0.9997
 ## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
-## Detection Rate         0.2845   0.1925   0.1735   0.1626   0.1838
-## Detection Prevalence   0.2850   0.1932   0.1751   0.1628   0.1839
-## Balanced Accuracy      0.9996   0.9969   0.9964   0.9960   0.9999</code></pre>
+## Detection Rate         0.2845   0.1908   0.1718   0.1597   0.1835
+## Detection Prevalence   0.2865   0.1932   0.1765   0.1600   0.1838
+## Balanced Accuracy      0.9986   0.9916   0.9898   0.9870   0.9992</code></pre>
 </div>
 </div>
 <div id="project-prediction-quiz" class="section level3">
