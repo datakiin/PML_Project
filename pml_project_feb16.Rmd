@@ -127,7 +127,7 @@ Building random forest classifications for a large number of variables is a comp
 #### Accuracy and Out-of-sample Error
 The preTest data split for cross validation is used to initially test the model's accuracy. The confusion matrix shows predictions against reference classes A-E.
 
-The out of sample error is the error rate observed on the preTest data which is 100% - accuracy = 100% - 99.68% = .32%.
+The out of sample error is the error rate observed on the preTest data which is (100% - accuracy = 100% - 99.03% =) 0.97%.
 
 ```{r modelCheck, echo=TRUE, message=FALSE}
   predictions <- predict(modFit, preTest)
